@@ -8,10 +8,6 @@ import google.generativeai as genai
 import pandas as pd
 import json
 from datetime import datetime, timedelta
-import matplotlib.pyplot as plt
-import plotly.graph_objects as go
-import plotly.express as px
-import re
 
 # Page configuration
 st.set_page_config(
@@ -69,309 +65,297 @@ if 'chat_history' not in st.session_state:
     st.session_state.chat_history = []
 
 # ============================================================================
-# VISUALIZATION FUNCTIONS
+# TABULAR FORMATTING FUNCTIONS
 # ============================================================================
 
-def create_weekly_training_schedule_chart(training_data):
-    """Create a bar chart showing weekly training schedule"""
+def create_weekly_training_table(training_days=None):
+    """Create a table showing weekly training schedule"""
     
-    days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+    if training_days is None:
+        training_days = {
+            'Monday': {'Intensity': 8, 'Focus': 'Strength Training', 'Duration': '60 min'},
+            'Tuesday': {'Intensity': 6, 'Focus': 'Cardio/Endurance', 'Duration': '45 min'},
+            'Wednesday': {'Intensity': 9, 'Focus': 'Sport-Specific Skills', 'Duration': '75 min'},
+            'Thursday': {'Intensity': 5, 'Focus': 'Recovery/Mobility', 'Duration': '30 min'},
+            'Friday': {'Intensity': 7, 'Focus': 'Strength + Conditioning', 'Duration': '60 min'},
+            'Saturday': {'Intensity': 4, 'Focus': 'Light Cardio', 'Duration': '30 min'},
+            'Sunday': {'Intensity': 2, 'Focus': 'Rest/Active Recovery', 'Duration': '20 min'}
+        }
     
-    if training_data:
-        intensities = training_data
-    else:
-        intensities = [8, 6, 9, 5, 7, 4, 2]
+    df = pd.DataFrame.from_dict(training_days, orient='index')
+    df.index.name = 'Day'
+    df.reset_index(inplace=True)
     
-    fig = go.Figure()
-    colors = ['#1E88E5', '#43A047', '#FB8C00', '#E53935', '#8E24AA', '#00ACC1', '#7CB342']
-    
-    fig.add_trace(go.Bar(
-        x=days,
-        y=intensities,
-        marker_color=colors,
-        text=intensities,
-        textposition='auto',
-        hovertemplate='<b>%{x}</b><br>Intensity: %{y}/10<extra></extra>'
-    ))
-    
-    fig.update_layout(
-        title='Weekly Training Intensity Schedule',
-        xaxis_title='Day of Week',
-        yaxis_title='Training Intensity (1-10)',
-        yaxis_range=[0, 10],
-        template='plotly_white',
-        height=400,
-        showlegend=False
-    )
-    
-    return fig
+    return df
 
-def create_training_distribution_pie(training_types):
-    """Create a pie chart showing training type distribution"""
+def create_training_distribution_table(training_types=None):
+    """Create a table showing training type distribution"""
     
-    if training_types:
-        labels = list(training_types.keys())
-        values = list(training_types.values())
-    else:
-        labels = ['Strength Training', 'Cardio/Endurance', 'Skill Work', 
-                  'Flexibility/Mobility', 'Rest/Recovery']
-        values = [25, 30, 25, 10, 10]
+    if training_types is None:
+        training_types = {
+            'Strength Training': 30,
+            'Cardio/Endurance': 25,
+            'Skill Work': 25,
+            'Flexibility/Mobility': 10,
+            'Rest/Recovery': 10
+        }
     
-    colors = ['#1E88E5', '#43A047', '#FB8C00', '#E53935', '#8E24AA']
+    df = pd.DataFrame(list(training_types.items()), columns=['Training Type', 'Percentage (%)'])
+    df['Hours per Week'] = (df['Percentage (%)'] / 100 * 10).round(1)  # Assuming 10 hours/week
     
-    fig = go.Figure(data=[go.Pie(
-        labels=labels,
-        values=values,
-        hole=0.4,
-        marker_colors=colors,
-        textinfo='label+percent',
-        hovertemplate='<b>%{label}</b><br>%{value}%<br>%{percent}<extra></extra>'
-    )])
-    
-    fig.update_layout(
-        title='Training Type Distribution',
-        template='plotly_white',
-        height=400,
-        showlegend=True
-    )
-    
-    return fig
+    return df
 
-def create_nutrition_macro_pie(macros):
-    """Create a pie chart for nutrition macros"""
+def create_nutrition_table(calorie_goal='Maintenance'):
+    """Create a nutrition breakdown table"""
     
-    if macros:
-        labels = list(macros.keys())
-        values = list(macros.values())
-    else:
-        labels = ['Protein', 'Carbohydrates', 'Fats']
-        values = [30, 45, 25]
+    data = {
+        'Nutrient': ['Protein', 'Carbohydrates', 'Fats', 'Total Calories'],
+        'Percentage': ['30%', '45%', '25%', '100%'],
+        'Grams per Day': ['150g', '280g', '70g', '-'],
+        'Calories': ['600 kcal', '1120 kcal', '630 kcal', '2350 kcal']
+    }
     
-    colors = ['#E53935', '#FB8C00', '#43A047']
-    
-    fig = go.Figure(data=[go.Pie(
-        labels=labels,
-        values=values,
-        hole=0.3,
-        marker_colors=colors,
-        textinfo='label+percent',
-        textfont_size=14
-    )])
-    
-    fig.update_layout(
-        title='Daily Macro Distribution (%)',
-        template='plotly_white',
-        height=400
-    )
-    
-    return fig
+    df = pd.DataFrame(data)
+    return df
 
-def create_progress_timeline_chart(weeks=8):
-    """Create a line chart showing expected progress timeline"""
+def create_weekly_meal_plan_table():
+    """Create a sample weekly meal plan table"""
     
-    weeks_list = list(range(1, weeks + 1))
-    strength = [20, 30, 42, 55, 65, 75, 82, 90][:weeks]
-    endurance = [25, 35, 45, 58, 68, 76, 84, 92][:weeks]
-    skill = [30, 38, 48, 58, 68, 76, 83, 89][:weeks]
+    meals = {
+        'Day': ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+        'Breakfast': ['Oatmeal + Eggs', 'Greek Yogurt + Fruits', 'Whole Grain Toast + Avocado', 
+                     'Protein Smoothie', 'Scrambled Eggs + Veggies', 'Pancakes + Berries', 'Omelet + Toast'],
+        'Lunch': ['Chicken + Rice + Veggies', 'Fish + Quinoa Salad', 'Turkey Wrap + Soup',
+                 'Pasta + Lean Meat', 'Grilled Chicken Salad', 'Rice Bowl + Protein', 'Sandwich + Fruit'],
+        'Dinner': ['Salmon + Sweet Potato', 'Lean Beef + Brown Rice', 'Chicken Stir-fry',
+                  'Fish + Vegetables', 'Turkey + Quinoa', 'Grilled Chicken + Pasta', 'Lean Meat + Rice'],
+        'Snacks': ['Protein Bar + Nuts', 'Fruit + Cheese', 'Hummus + Veggies',
+                  'Greek Yogurt', 'Trail Mix', 'Protein Shake', 'Fruit + Nut Butter']
+    }
     
-    fig = go.Figure()
-    
-    fig.add_trace(go.Scatter(
-        x=weeks_list, y=strength,
-        mode='lines+markers',
-        name='Strength',
-        line=dict(color='#1E88E5', width=3),
-        marker=dict(size=8)
-    ))
-    
-    fig.add_trace(go.Scatter(
-        x=weeks_list, y=endurance,
-        mode='lines+markers',
-        name='Endurance',
-        line=dict(color='#43A047', width=3),
-        marker=dict(size=8)
-    ))
-    
-    fig.add_trace(go.Scatter(
-        x=weeks_list, y=skill,
-        mode='lines+markers',
-        name='Skill Level',
-        line=dict(color='#FB8C00', width=3),
-        marker=dict(size=8)
-    ))
-    
-    fig.update_layout(
-        title=f'{weeks}-Week Progress Timeline',
-        xaxis_title='Week',
-        yaxis_title='Progress Level (%)',
-        yaxis_range=[0, 100],
-        template='plotly_white',
-        height=400,
-        hovermode='x unified'
-    )
-    
-    return fig
+    df = pd.DataFrame(meals)
+    return df
 
-def create_workout_volume_chart():
-    """Create a stacked bar chart showing workout volume by muscle group"""
+def create_exercise_table(exercises=None):
+    """Create an exercise routine table"""
     
-    muscle_groups = ['Legs', 'Back', 'Chest', 'Shoulders', 'Arms', 'Core']
-    strength_sets = [12, 10, 8, 6, 8, 10]
-    endurance_sets = [8, 6, 5, 4, 5, 8]
+    if exercises is None:
+        exercises = {
+            'Exercise': ['Squats', 'Bench Press', 'Deadlifts', 'Pull-ups', 'Shoulder Press', 
+                        'Lunges', 'Rows', 'Core Work'],
+            'Sets': [4, 4, 3, 3, 3, 3, 4, 3],
+            'Reps': ['8-10', '8-10', '6-8', '8-12', '10-12', '10 each leg', '10-12', '15-20'],
+            'Rest (sec)': [90, 90, 120, 90, 60, 60, 75, 45],
+            'Notes': ['Focus on form', 'Control the weight', 'Keep back straight', 
+                     'Use assistance if needed', 'Full range of motion', 'Maintain balance',
+                     'Squeeze at top', 'Engage core throughout']
+        }
     
-    fig = go.Figure()
-    
-    fig.add_trace(go.Bar(
-        name='Strength Sets',
-        x=muscle_groups,
-        y=strength_sets,
-        marker_color='#1E88E5'
-    ))
-    
-    fig.add_trace(go.Bar(
-        name='Endurance Sets',
-        x=muscle_groups,
-        y=endurance_sets,
-        marker_color='#43A047'
-    ))
-    
-    fig.update_layout(
-        title='Weekly Training Volume by Muscle Group',
-        xaxis_title='Muscle Group',
-        yaxis_title='Number of Sets',
-        barmode='stack',
-        template='plotly_white',
-        height=400
-    )
-    
-    return fig
+    df = pd.DataFrame(exercises)
+    return df
 
-def display_visualization_dashboard(feature_type, training_frequency, training_duration):
-    """Display appropriate visualizations based on feature type"""
+def create_progress_tracking_table(weeks=8):
+    """Create a progress tracking table"""
+    
+    data = {
+        'Week': list(range(1, weeks + 1)),
+        'Strength (%)': [20, 30, 42, 55, 65, 75, 82, 90][:weeks],
+        'Endurance (%)': [25, 35, 45, 58, 68, 76, 84, 92][:weeks],
+        'Skill Level (%)': [30, 38, 48, 58, 68, 76, 83, 89][:weeks],
+        'Body Weight (kg)': [70, 70.5, 71, 71.2, 71.5, 71.8, 72, 72.2][:weeks],
+        'Notes': ['Baseline', 'Good progress', 'Increasing intensity', 'Maintaining form',
+                 'Peak week', 'Recovery focus', 'Final push', 'Assessment week'][:weeks]
+    }
+    
+    df = pd.DataFrame(data)
+    return df
+
+def create_injury_recovery_table():
+    """Create an injury recovery timeline table"""
+    
+    data = {
+        'Phase': ['Week 1-2', 'Week 3-4', 'Week 5-6', 'Week 7-8', 'Week 9+'],
+        'Focus': ['Pain Management', 'Gentle Movement', 'Strength Building', 
+                 'Sport-Specific Work', 'Full Training'],
+        'Intensity': ['Very Low (2-3/10)', 'Low (3-4/10)', 'Moderate (5-6/10)', 
+                     'High (7-8/10)', 'Full (9-10/10)'],
+        'Activities': ['Ice, Rest, Gentle Stretching', 'Pool Work, Light Mobility', 
+                      'Resistance Bands, Bodyweight', 'Light Sport Drills', 'Full Practice'],
+        'Red Flags': ['Sharp pain, Swelling', 'Persistent pain', 'Limited ROM',
+                     'Pain during sport moves', 'Recurring issues']
+    }
+    
+    df = pd.DataFrame(data)
+    return df
+
+def display_tabular_dashboard(feature_type, training_frequency, training_duration):
+    """Display training data in tabular format"""
     
     st.markdown("---")
-    st.markdown("## 📊 Training Visualizations & Analytics")
-    st.markdown("*Automatically generated based on your training plan*")
+    st.markdown("## 📊 Training Schedule & Breakdown (Tables)")
+    st.markdown("*Organized data for easy tracking and reference*")
     
-    # ALWAYS show these two core charts for ALL features
-    st.markdown("### 📅 Your Weekly Training Schedule")
-    col1, col2 = st.columns(2)
+    # ALWAYS show weekly training schedule
+    st.markdown("### 📅 Weekly Training Schedule")
+    weekly_table = create_weekly_training_table()
+    st.dataframe(weekly_table, use_container_width=True, hide_index=True)
     
-    with col1:
-        # Training Schedule Bar Chart - ALWAYS SHOWN
-        st.plotly_chart(create_weekly_training_schedule_chart(None), use_container_width=True)
-    
-    with col2:
-        # Training Distribution Pie Chart - ALWAYS SHOWN
-        if "Nutrition" in feature_type:
-            macros = {'Protein': 30, 'Carbohydrates': 45, 'Fats': 25}
-            st.plotly_chart(create_nutrition_macro_pie(macros), use_container_width=True)
-        else:
-            training_types = {
-                'Strength Training': 30,
-                'Cardio/Endurance': 25,
-                'Skill Work': 25,
-                'Flexibility': 10,
-                'Rest/Recovery': 10
-            }
-            st.plotly_chart(create_training_distribution_pie(training_types), use_container_width=True)
-    
-    # Additional feature-specific charts
-    st.markdown("### 📈 Additional Analytics")
-    
+    # Show feature-specific tables
     if "Workout" in feature_type or "Training" in feature_type or "Strength" in feature_type:
         
-        col3, col4 = st.columns(2)
+        col1, col2 = st.columns(2)
         
-        with col3:
-            st.plotly_chart(create_progress_timeline_chart(8), use_container_width=True)
+        with col1:
+            st.markdown("### 💪 Exercise Routine")
+            exercise_table = create_exercise_table()
+            st.dataframe(exercise_table, use_container_width=True, hide_index=True)
         
-        with col4:
-            st.plotly_chart(create_workout_volume_chart(), use_container_width=True)
+        with col2:
+            st.markdown("### 📈 Training Distribution")
+            distribution_table = create_training_distribution_table()
+            st.dataframe(distribution_table, use_container_width=True, hide_index=True)
+        
+        st.markdown("### 📊 8-Week Progress Tracking")
+        progress_table = create_progress_tracking_table(8)
+        st.dataframe(progress_table, use_container_width=True, hide_index=True)
     
     elif "Nutrition" in feature_type:
         
-        col3, col4 = st.columns(2)
+        col1, col2 = st.columns(2)
         
-        with col3:
+        with col1:
+            st.markdown("### 🍽️ Macro Breakdown")
+            nutrition_table = create_nutrition_table()
+            st.dataframe(nutrition_table, use_container_width=True, hide_index=True)
+        
+        with col2:
+            st.markdown("### 📋 Training Distribution")
             meal_dist = {
                 'Breakfast': 25,
                 'Lunch': 30,
                 'Dinner': 30,
                 'Snacks': 15
             }
-            st.plotly_chart(create_training_distribution_pie(meal_dist), use_container_width=True)
+            meal_table = pd.DataFrame(list(meal_dist.items()), 
+                                     columns=['Meal', 'Calorie %'])
+            st.dataframe(meal_table, use_container_width=True, hide_index=True)
         
-        with col4:
-            st.plotly_chart(create_progress_timeline_chart(7), use_container_width=True)
+        st.markdown("### 🗓️ Weekly Meal Plan")
+        meal_plan_table = create_weekly_meal_plan_table()
+        st.dataframe(meal_plan_table, use_container_width=True, hide_index=True)
     
     elif "Recovery" in feature_type or "Mobility" in feature_type:
         
-        col3, col4 = st.columns(2)
+        st.markdown("### 🏥 Recovery Timeline")
+        recovery_table = create_injury_recovery_table()
+        st.dataframe(recovery_table, use_container_width=True, hide_index=True)
         
-        with col3:
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            st.markdown("### 🧘 Recovery Activities")
             recovery_types = {
                 'Stretching': 30,
                 'Foam Rolling': 20,
                 'Low Impact Cardio': 25,
                 'Rest': 25
             }
-            st.plotly_chart(create_training_distribution_pie(recovery_types), use_container_width=True)
+            recovery_dist = pd.DataFrame(list(recovery_types.items()), 
+                                        columns=['Activity', 'Time %'])
+            st.dataframe(recovery_dist, use_container_width=True, hide_index=True)
         
-        with col4:
-            st.plotly_chart(create_progress_timeline_chart(8), use_container_width=True)
+        with col2:
+            st.markdown("### 📊 Progress Tracking")
+            progress_table = create_progress_tracking_table(8)
+            st.dataframe(progress_table[['Week', 'Strength (%)', 'Endurance (%)']],
+                        use_container_width=True, hide_index=True)
     
     elif "Endurance" in feature_type or "Speed" in feature_type:
         
-        col3, col4 = st.columns(2)
+        col1, col2 = st.columns(2)
         
-        with col3:
+        with col1:
+            st.markdown("### 🏃 Training Types")
             training_types = {
                 'Interval Training': 35,
                 'Long Distance': 30,
                 'Speed Work': 20,
                 'Recovery Runs': 15
             }
-            st.plotly_chart(create_training_distribution_pie(training_types), use_container_width=True)
+            training_dist = pd.DataFrame(list(training_types.items()),
+                                        columns=['Type', 'Percentage %'])
+            st.dataframe(training_dist, use_container_width=True, hide_index=True)
         
-        with col4:
-            st.plotly_chart(create_progress_timeline_chart(12), use_container_width=True)
+        with col2:
+            st.markdown("### 📈 Training Distribution")
+            distribution_table = create_training_distribution_table(training_types)
+            st.dataframe(distribution_table, use_container_width=True, hide_index=True)
+        
+        st.markdown("### 📊 12-Week Progress Plan")
+        progress_table = create_progress_tracking_table(12)
+        st.dataframe(progress_table, use_container_width=True, hide_index=True)
     
     else:
-        col3, col4 = st.columns(2)
+        # Default tables for other features
+        col1, col2 = st.columns(2)
         
-        with col3:
+        with col1:
+            st.markdown("### 📋 Training Distribution")
             default_types = {
                 'Physical Training': 40,
                 'Skill Development': 30,
                 'Mental Training': 15,
                 'Recovery': 15
             }
-            st.plotly_chart(create_training_distribution_pie(default_types), use_container_width=True)
+            default_dist = pd.DataFrame(list(default_types.items()),
+                                       columns=['Category', 'Percentage %'])
+            st.dataframe(default_dist, use_container_width=True, hide_index=True)
         
-        with col4:
-            st.plotly_chart(create_progress_timeline_chart(8), use_container_width=True)
+        with col2:
+            st.markdown("### 📊 Progress Tracking")
+            progress_table = create_progress_tracking_table(8)
+            st.dataframe(progress_table[['Week', 'Strength (%)', 'Skill Level (%)']],
+                        use_container_width=True, hide_index=True)
 
 # Header
 st.markdown('<h1 class="main-header">🏋️ CoachBot AI</h1>', unsafe_allow_html=True)
-st.markdown('<p class="sub-header">Your Personal AI Fitness & Sports Coach - Powered by Gemini 2.0 Flash</p>', unsafe_allow_html=True)
-st.markdown('<p style="text-align: center; color: #1E88E5; font-weight: 500;">✨ Now with Interactive Training Graphs & Analytics ✨</p>', unsafe_allow_html=True)
+st.markdown('<p class="sub-header">Your Personal AI Fitness & Sports Coach - Powered by Gemini 2.5 Flash</p>', unsafe_allow_html=True)
+st.markdown('<p style="text-align: center; color: #1E88E5; font-weight: 500;">✨ Now with Organized Training Tables & Data ✨</p>', unsafe_allow_html=True)
 
 # Sidebar for API Key and User Profile
 with st.sidebar:
     st.header("⚙️ Configuration")
     
-    # API Key Input
-    api_key = st.text_input("Enter Gemini API Key", type="password", help="Get your API key from Google AI Studio")
+    # API Key from Streamlit Secrets or Input
+    api_key = None
     
-    if api_key:
-        try:
+    # Try to get API key from Streamlit secrets first
+    try:
+        if 'GEMINI_API_KEY' in st.secrets:
+            api_key = st.secrets['GEMINI_API_KEY']
+            st.success("✅ API Key loaded from secrets!")
             genai.configure(api_key=api_key)
             st.session_state.api_key_configured = True
-            st.success("✅ API Key Configured!")
-        except Exception as e:
-            st.error(f"❌ Invalid API Key: {str(e)}")
-            st.session_state.api_key_configured = False
+        else:
+            # Fallback to manual input
+            api_key = st.text_input("Enter Gemini API Key", type="password", 
+                                   help="Get your API key from Google AI Studio or configure in Streamlit secrets")
+            if api_key:
+                genai.configure(api_key=api_key)
+                st.session_state.api_key_configured = True
+                st.success("✅ API Key Configured!")
+    except Exception as e:
+        # If secrets not available, use text input
+        api_key = st.text_input("Enter Gemini API Key", type="password", 
+                               help="Get your API key from Google AI Studio")
+        if api_key:
+            try:
+                genai.configure(api_key=api_key)
+                st.session_state.api_key_configured = True
+                st.success("✅ API Key Configured!")
+            except Exception as e:
+                st.error(f"❌ Invalid API Key: {str(e)}")
+                st.session_state.api_key_configured = False
     
     st.markdown("---")
     
@@ -507,16 +491,9 @@ if st.session_state.api_key_configured:
         )
         
         st.markdown("---")
-        st.markdown("**📊 Visualization Settings**")
-        show_charts = st.checkbox("Show Training Visualizations", value=True, 
-                                   help="Display charts and graphs with your plan")
-        
-        if show_charts:
-            chart_style = st.selectbox(
-                "Chart Style",
-                ["Default", "Dark Mode", "Minimal", "Colorful"],
-                help="Choose visualization theme"
-            )
+        st.markdown("**📊 Display Settings**")
+        show_charts = st.checkbox("Show Training Tables & Data", value=True, 
+                                   help="Display organized tables with your plan")
     
     # Generate button
     if st.button("🚀 Generate Personalized Plan", type="primary"):
@@ -803,7 +780,7 @@ if st.session_state.api_key_configured:
                 }
                 
                 model = genai.GenerativeModel(
-                    model_name="gemini-2.0-flash-exp",
+                    model_name="gemini-2.5-flash",
                     generation_config=generation_config
                 )
                 
@@ -823,9 +800,9 @@ if st.session_state.api_key_configured:
                 st.markdown(response.text)
                 st.markdown('</div>', unsafe_allow_html=True)
                 
-                # Display visualizations if enabled
+                # Display tables if enabled
                 if 'show_charts' not in locals() or show_charts:
-                    display_visualization_dashboard(feature, training_frequency, training_duration)
+                    display_tabular_dashboard(feature, training_frequency, training_duration)
                 
                 # Save to chat history
                 st.session_state.chat_history.append({
@@ -909,7 +886,7 @@ else:
         - Tournament prep
         """)
     
-    st.info("📊 **NEW**: Every plan includes interactive training schedule graphs and pie charts automatically!")
+    st.info("📊 **NEW**: Every plan includes organized training tables and schedules automatically!")
 
 # Footer
 st.markdown("---")
