@@ -56,3 +56,4 @@ The system was evaluated using multiple test cases across different sports, posi
 **Deployment**
 
 The application was built using Streamlit and connected to the Gemini API to generate AI-driven responses. The complete project was hosted on GitHub and deployed on Streamlit Cloud, allowing public access to the web application.
+
