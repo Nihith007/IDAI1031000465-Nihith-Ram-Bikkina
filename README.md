@@ -77,6 +77,9 @@ The application was built with Streamlit and integrated with the Gemini API to g
 
 <img width="1360" height="315" alt="image" src="https://github.com/user-attachments/assets/673b6e1d-b91b-4705-955b-4c9f9ac9a799" />
 
+<img width="1416" height="797" alt="image" src="https://github.com/user-attachments/assets/4789885b-b411-4f88-a901-ee7b1c93b736" />
+
+
 
 
 
