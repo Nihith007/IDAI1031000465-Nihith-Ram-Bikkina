@@ -683,19 +683,6 @@ Be conversational but expert. Do not use HTML tags. Reference the athlete's prof
                 st.markdown(answer)
                 st.markdown("</div>", unsafe_allow_html=True)
 
-                # Reference tables
-                st.markdown("---")
-                st.markdown("### 📊 Your Training Reference Tables")
-                rc1, rc2 = st.columns(2)
-                with rc1:
-                    st.markdown("**📅 Weekly Schedule**")
-                    st.dataframe(create_weekly_training_table("Moderate"),
-                                 use_container_width=True, hide_index=True)
-                with rc2:
-                    st.markdown("**📈 Training Distribution**")
-                    st.dataframe(create_training_distribution_table(),
-                                 use_container_width=True, hide_index=True)
-
                 st.download_button(
                     "📥 Download Response",
                     data=answer,
