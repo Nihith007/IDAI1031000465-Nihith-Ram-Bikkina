@@ -70,7 +70,7 @@ The application was built with Streamlit and integrated with the Gemini API to g
 * Restart or refresh the app to apply the secret.
 * Test the application to confirm that AI-generated responses are working correctly.
 
-**Live app link:** https://idai1031000465nihithrambikkina-4ypsjvkap2xaakm3mkhtf6.streamlit.app/ 
+**Live app link:** https://coachbot-nihith-ram-bikkina-m6zomlbzkmbhpqjyv7akjz.streamlit.app/ 
 
 # Screenshots
 
