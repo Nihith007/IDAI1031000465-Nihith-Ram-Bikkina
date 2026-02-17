@@ -608,76 +608,52 @@ Emphasise safety throughout. Make the plan specific to {sport} movement demands.
                     st.markdown("---")
 
     # ══════════════════════════════════════════
-    # TAB 2 — CUSTOM COACH
+    # TAB 2 — CUSTOM COACH (Simple Q&A Only)
     # ══════════════════════════════════════════
     with tab2:
 
         st.subheader("🧠 Custom Coach Consultation")
         st.markdown(
             '<div class="feature-box">'
-            "Ask any specific coaching question. Provide your sport and age directly in your question, "
-            "or use the fields below for a fully personalised answer."
+            "Ask any specific coaching question and get expert advice."
             "</div>",
             unsafe_allow_html=True,
         )
 
-        # Direct inputs for Tab 2 (not using sidebar)
-        col_sport, col_age = st.columns(2)
-        with col_sport:
-            custom_sport = st.text_input("Your Sport (optional)", 
-                                         placeholder="e.g. Football, Basketball, Tennis",
-                                         key="custom_sport")
-        with col_age:
-            custom_age = st.number_input("Your Age (optional)", 
-                                         min_value=10, max_value=100, value=18,
-                                         key="custom_age")
-
         user_query = st.text_area(
-            "Ask a specific coaching question:",
-            placeholder="e.g. Suggest 3 drills for explosive speed. What's the best pre-match meal for a swimmer?",
-            height=130,
+            "Ask your coaching question:",
+            placeholder="e.g. What are 3 best drills for explosive speed? How should I structure my training week? What should I eat before a match?",
+            height=150,
         )
 
         col_a, col_b = st.columns([1, 2])
         with col_a:
-            intensity_val = st.slider("Advice Intensity", 1, 100, 40)
+            intensity_val = st.slider("Advice Detail Level", 1, 100, 50, key="detail_slider")
             ai_temp       = intensity_val / 100.0
-            st.caption(f"Temperature: **{ai_temp:.2f}** — higher = more creative answers")
+            st.caption(f"Temperature: **{ai_temp:.2f}**")
         with col_b:
             st.info(
-                "💡 **Tip:** Either mention your sport/age directly in your question, "
-                "or fill in the sport and age fields above for context-aware answers."
+                "💡 **Tip:** Be specific in your question. Mention your sport, age, position, "
+                "or any relevant details directly in your question for personalized advice."
             )
 
         if st.button("🎯 Ask AI Coach", type="primary", key="custom_coach_btn"):
             if not user_query.strip():
                 st.warning("Please type a question before submitting.")
             else:
-                # Build minimal context from Tab 2 inputs only (no sidebar)
-                context_parts = []
-                if custom_sport:
-                    context_parts.append(f"Sport: {custom_sport}")
-                if custom_age:
-                    context_parts.append(f"Age: {custom_age} years old")
-                
-                context_note = " | ".join(context_parts) if context_parts else "No additional context provided"
-
                 custom_prompt = f"""
-You are a professional sports coach and fitness expert. Answer the question below.
-
-Context: {context_note}
+You are a professional sports coach and fitness expert. Answer this question clearly and helpfully.
 
 Question: {user_query}
-Advice Intensity: {intensity_val}/100
 
-Write your response like this:
-1. Start with 1-2 paragraphs of advice that directly answers the question. If sport/age was provided, reference it naturally. If not provided, give general expert advice.
-2. Then provide a Markdown table with structured data, drills, steps, or breakdowns relevant to the question (use appropriate columns for the topic).
-3. End with 1 short paragraph of key tips or practical reminders.
+Write your response in this format:
+1. Start with 1-2 paragraphs directly answering the question with clear, practical advice.
+2. Then provide a Markdown table with structured information (drills, exercises, meal plans, schedule, etc. - whatever is most relevant to the question).
+3. End with 1 short paragraph of additional tips or key reminders.
 
-Be conversational but expert. Do not use HTML tags.
+Be conversational, expert, and practical. Do not use HTML tags.
 """
-                with st.spinner("🤖 Consulting your AI Coach..."):
+                with st.spinner("🤖 Getting expert coaching advice..."):
                     custom_model = genai.GenerativeModel(
                         "gemini-2.5-flash",
                         generation_config={
