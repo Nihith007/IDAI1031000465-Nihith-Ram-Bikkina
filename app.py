@@ -611,7 +611,7 @@ Emphasise safety throughout. Make the plan specific to {sport} movement demands.
     # TAB 2 — CUSTOM COACH
     # ══════════════════════════════════════════
     with tab2:
-
+        remove(st.sidebar)
         st.subheader("🧠 Custom Coach Consultation")
         st.markdown(
             '<div class="feature-box">'
