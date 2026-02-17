@@ -59,6 +59,17 @@ The system was tested across multiple sports, playing roles, and injury scenario
 
 The application was built with Streamlit and integrated with the Gemini API to generate AI-driven responses. The complete project was hosted on GitHub and deployed on Streamlit Cloud, allowing public access to the web application.
 
+* Open Google AI Studio and sign in with a Google account.
+* Go to API keys / Get API key and click Create API key.
+* Select or create a Google Cloud project and copy the generated Gemini API key.
+* Open your Streamlit app code and configure the Gemini client using st.secrets["GEMINI_API_KEY"] instead of hardcoding the key.
+* Upload the project files to GitHub, ensuring no API keys are included in the repository.
+* Log in to Streamlit Cloud and deploy the app by selecting the repository, branch, and main file.
+* After deployment, open the app settings in Streamlit Cloud and go to Secrets.
+* Add GEMINI_API_KEY = "your_api_key_here" in the secrets section and save.
+* Restart or refresh the app to apply the secret.
+* Test the application to confirm that AI-generated responses are working correctly.
+
 **Live app link:** https://idai1031000465nihithrambikkina-4ypsjvkap2xaakm3mkhtf6.streamlit.app/ 
 
 # Screenshots
@@ -79,6 +90,9 @@ The application was built with Streamlit and integrated with the Gemini API to g
 
 <img width="1416" height="797" alt="image" src="https://github.com/user-attachments/assets/4789885b-b411-4f88-a901-ee7b1c93b736" />
 
+# Example Prompts
+
+Design a strength and conditioning program for a 16-year-old midfielder playing football.
 
 
 
