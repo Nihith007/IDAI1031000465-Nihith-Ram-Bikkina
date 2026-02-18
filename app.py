@@ -58,7 +58,35 @@ st.markdown("""
     border-radius: 5px;
     padding: 0.5rem 1rem;
 }
+/* Hide sidebar for Tab 2 */
+[data-testid="stSidebar"][aria-label="sidebar"] {
+    display: block;
+}
 </style>
+<script>
+// Hide sidebar when Custom Coach tab is active
+const tabs = window.parent.document.querySelectorAll('[role="tab"]');
+const sidebar = window.parent.document.querySelector('[data-testid="stSidebar"]');
+
+if (tabs && sidebar) {
+    tabs.forEach((tab, index) => {
+        tab.addEventListener('click', () => {
+            if (index === 1) {  // Tab 2 (Custom Coach)
+                sidebar.style.display = 'none';
+            } else {  // Tab 1 (Smart Assistant)
+                sidebar.style.display = 'block';
+            }
+        });
+    });
+    
+    // Check initial state
+    const activeTab = window.parent.document.querySelector('[role="tab"][aria-selected="true"]');
+    if (activeTab) {
+        const activeIndex = Array.from(tabs).indexOf(activeTab);
+        sidebar.style.display = activeIndex === 1 ? 'none' : 'block';
+    }
+}
+</script>
 """, unsafe_allow_html=True)
 
 # ─────────────────────────────────────────────
