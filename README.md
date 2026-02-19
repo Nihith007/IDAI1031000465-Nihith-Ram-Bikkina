@@ -94,13 +94,43 @@ The application was built with Streamlit and integrated with the Gemini API to g
 
 Design a strength and conditioning program for a 16-year-old midfielder playing football.
 
-<img width="1410" height="894" alt="image" src="https://github.com/user-attachments/assets/86fa9f8d-0966-4b0d-9df3-db51d1623e7c" />
+<img width="1455" height="885" alt="image" src="https://github.com/user-attachments/assets/0801bcc0-3512-465f-8371-4414b3afa6fa" />
 
 Create a beginner-to-advanced training progression plan for an athlete in basketball.
 
-<img width="1362" height="925" alt="image" src="https://github.com/user-attachments/assets/d0604424-4c33-4b26-ab1c-b41d4f515268" />
+<img width="1480" height="740" alt="image" src="https://github.com/user-attachments/assets/23a58719-0417-4d32-ba1a-86f8c945e255" />
 
 Suggest low-impact workouts to maintain fitness while recovering from an ankle sprain.
+
+<img width="1387" height="891" alt="image" src="https://github.com/user-attachments/assets/451a6460-16ab-4428-9d8a-98e375c810d2" />
+
+Provide match-day preparation tips for a striker in football.
+
+<img width="1442" height="783" alt="image" src="https://github.com/user-attachments/assets/b627c615-cc7c-4787-b568-feddd874c424" />
+
+Generate a flexibility and mobility routine tailored for swimming.
+
+<img width="1392" height="599" alt="image" src="https://github.com/user-attachments/assets/e8fb6dfb-a442-40cf-b9f7-86015ac6adae" />
+
+Create a weekly endurance training plan for a long-distance runner in athletics.
+
+<img width="1431" height="843" alt="image" src="https://github.com/user-attachments/assets/b7dd7574-4cac-4035-99f7-9bd168f895de" />
+
+Suggest injury-prevention exercises commonly needed for cricket players.
+
+<img width="1433" height="870" alt="image" src="https://github.com/user-attachments/assets/a500756e-8e9e-4cfc-9d48-208194a0dc72" />
+
+Provide age-appropriate nutrition tips for a 15-year-old athlete training for tennis.
+
+<img width="1444" height="749" alt="image" src="https://github.com/user-attachments/assets/4c58dd1f-39bb-4f52-b34c-faa5154ffe9d" />
+
+Generate a home-based workout plan for athletes who play badminton without gym equipment.
+
+<img width="1509" height="804" alt="image" src="https://github.com/user-attachments/assets/eb66b4e0-1548-4861-83bc-1bd79bfe2c68" />
+
+Create a post-training recovery routine including stretching and rest tips for volleyball players.
+
+<img width="1471" height="857" alt="image" src="https://github.com/user-attachments/assets/75a3b0aa-52b2-45e6-8c29-fdf506882e59" />
 
 
 
