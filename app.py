@@ -452,33 +452,66 @@ Athlete Profile:
             prompts = {
 
 "1. Full-Body Workout Plan for [Position] in [Sport]": f"""
-You are an experienced sports coach. Create a full-body workout plan personalised for this athlete.
+You are an experienced sports coach. Create a full-body workout plan for this athlete.
 
 {user_context}
 
-Write your response in this exact format:
-1. Start with 2-3 paragraphs of text explaining the overall approach, why it suits this athlete's sport and position, any modifications for their injury history, and what they should focus on at their fitness level.
-2. Then include a Markdown table: Weekly Schedule (Day | Focus | Exercises | Sets x Reps | Duration | Intensity).
-3. Then 1-2 paragraphs explaining progressive overload and how intensity should increase over the training period.
-4. Then a Markdown table: Exercise Details (Exercise | Sets | Reps | Rest (sec) | Key Technique Tip | Injury Modification).
-5. End with a short paragraph on recovery and rest advice specific to their age and goal.
+IMPORTANT: You MUST include markdown tables in your response. Follow this structure exactly:
 
-Use their name if provided. Reference their sport and position throughout. Be specific to their fitness level.
+1. Write 2-3 paragraphs explaining the approach and why it suits this {position} in {sport}.
+
+2. Then create this MARKDOWN TABLE (copy this format exactly):
+
+| Day | Focus | Key Exercises | Sets x Reps | Duration |
+|-----|-------|---------------|-------------|----------|
+| Monday | Strength | Squats, Push-ups, Rows | 4x10, 3x12, 4x10 | 60 min |
+| Tuesday | Cardio | Running intervals | 6x400m | 45 min |
+(continue for all 7 days)
+
+3. Write 1-2 paragraphs on progressive overload.
+
+4. Then create this MARKDOWN TABLE:
+
+| Exercise | Sets | Reps | Rest | Technique Tip |
+|----------|------|------|------|---------------|
+| Squats | 4 | 10 | 90s | Keep chest up |
+(add 6-8 exercises)
+
+5. End with 1 paragraph on recovery advice for a {user_age}-year-old.
+
+CRITICAL: Use proper markdown table syntax with pipes (|) and dashes. Make the tables complete.
 """,
 
 "2. Safe Recovery Training Schedule for Athlete with [Injury]": f"""
-You are a sports physiotherapist and coach. Create a safe injury recovery programme for this athlete.
+You are a sports physiotherapist. Create a recovery plan for injury: {injury_history if injury_history else 'general recovery'}.
 
 {user_context}
 
-Write your response in this exact format:
-1. Start with 2-3 paragraphs explaining the recovery approach, why these phases suit their specific injury history, and key safety principles to follow.
-2. Then include a Markdown table: Recovery Timeline (Phase | Weeks | Focus | Exercises | Load Level | Duration/Day).
-3. Then 1-2 paragraphs explaining what warning signs to watch for and when to seek professional help.
-4. Then a Markdown table: Exercises to AVOID (Exercise | Reason | Safe Alternative Instead).
-5. End with a paragraph on return-to-sport criteria and mental readiness.
+MANDATORY FORMAT - Include these markdown tables:
 
-If injury history is 'None', create a general recovery/prevention plan. Be conservative and safety-first throughout.
+1. Write 2-3 paragraphs on recovery approach and safety principles.
+
+2. Create this MARKDOWN TABLE:
+
+| Phase | Weeks | Focus | Key Exercises | Load Level | Duration/Day |
+|-------|-------|-------|---------------|------------|--------------|
+| Phase 1 | 1-2 | Pain management | Gentle stretching | Very low | 15 min |
+| Phase 2 | 3-4 | Mobility | Pool work, bands | Low | 25 min |
+(continue for 4-5 phases)
+
+3. Write 1-2 paragraphs on warning signs.
+
+4. Create this MARKDOWN TABLE:
+
+| Exercise to AVOID | Reason | Safe Alternative |
+|-------------------|--------|------------------|
+| Jumping | Impact stress | Step-ups |
+| Sprinting | Re-injury risk | Walking intervals |
+(add 5-6 items)
+
+5. End with 1 paragraph on return criteria.
+
+CRITICAL: Use pipes (|) and dashes for markdown tables.
 """,
 
 "3. Tactical Coaching Tips to Improve [Skill] in [Sport]": f"""
@@ -497,18 +530,34 @@ Reference their specific position, sport, and goal throughout.
 """,
 
 "4. Week-Long Nutrition Guide for Young Athlete": f"""
-You are a sports nutritionist. Create a personalised week-long nutrition guide for this athlete.
+You are a sports nutritionist. Create a nutrition guide for this {user_age}-year-old {sport} athlete.
 
 {user_context}
 
-Write your response in this exact format:
-1. Start with 2-3 paragraphs explaining the nutritional approach for their sport, why the macro split suits their goal ({calorie_goal}), and how to handle their dietary restrictions ({diet_type}, allergies: {allergies if allergies else 'none'}).
-2. Then include a Markdown table: Daily Macros (Nutrient | Grams/Day | % of Total | Calories | Best Food Sources).
-3. Then 1-2 paragraphs on meal timing around training sessions and its importance for performance.
-4. Then a Markdown table: 7-Day Meal Plan (Day | Breakfast | Lunch | Dinner | Snacks | Approx kcal).
-5. End with a paragraph on hydration targets and practical grocery tips.
+IMPORTANT: You MUST include markdown tables. Follow this structure:
 
-Adapt all meals to {diet_type} and exclude {allergies if allergies else 'no allergens'}. Reference their age and sport throughout.
+1. Write 2-3 paragraphs on nutritional approach for {sport}, macro split for {calorie_goal}, and handling {diet_type} diet with allergies: {allergies if allergies else 'none'}.
+
+2. Create this MARKDOWN TABLE:
+
+| Nutrient | Grams/Day | % Total | Calories | Best Sources |
+|----------|-----------|---------|----------|--------------|
+| Protein | 150g | 30% | 600 | Chicken, eggs, beans |
+| Carbs | 280g | 45% | 1120 | Rice, oats, fruits |
+| Fats | 70g | 25% | 630 | Avocado, nuts, oil |
+
+3. Write 1-2 paragraphs on meal timing around training.
+
+4. Create this MARKDOWN TABLE:
+
+| Day | Breakfast | Lunch | Dinner | Snacks | Total kcal |
+|-----|-----------|-------|--------|--------|------------|
+| Monday | Oatmeal + eggs | Chicken rice bowl | Salmon + veggies | Protein shake | 2400 |
+(continue for all 7 days, adapt to {diet_type}, exclude {allergies if allergies else 'nothing'})
+
+5. End with 1 paragraph on hydration and grocery tips.
+
+CRITICAL: Use proper markdown table format with pipes (|) and dashes.
 """,
 
 "5. Personalized Warm-up & Cooldown Routine": f"""
@@ -696,16 +745,23 @@ Emphasise safety throughout. Make the plan specific to {sport} movement demands.
                 st.warning("Please type a question before submitting.")
             else:
                 custom_prompt = f"""
-You are a professional sports coach and fitness expert. Answer this question clearly and helpfully.
+You are a professional sports coach. Answer this question with text AND a markdown table.
 
 Question: {user_query}
 
-Write your response in this format:
-1. Start with 1-2 paragraphs directly answering the question with clear, practical advice.
-2. Then provide a Markdown table with structured information (drills, exercises, meal plans, schedule, etc. - whatever is most relevant to the question).
-3. End with 1 short paragraph of additional tips or key reminders.
+Response format (MANDATORY):
 
-Be conversational, expert, and practical. Do not use HTML tags.
+1. Write 1-2 paragraphs answering the question with clear advice.
+
+2. Create a MARKDOWN TABLE related to the question. Examples:
+   - If question is about drills: make a table with Drill | Duration | How To | Benefit
+   - If about meals: Meal | Time | Foods | Macros
+   - If about exercises: Exercise | Sets | Reps | Notes
+   Use pipes (|) and dashes for proper markdown format.
+
+3. End with 1 short paragraph of tips.
+
+CRITICAL: Your response MUST include at least one properly formatted markdown table.
 """
                 with st.spinner("🤖 Getting expert coaching advice..."):
                     from google.generativeai.types import HarmCategory, HarmBlockThreshold
