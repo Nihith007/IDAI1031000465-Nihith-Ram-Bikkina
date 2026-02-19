@@ -98,6 +98,12 @@ Design a strength and conditioning program for a 16-year-old midfielder playing 
 
 Create a beginner-to-advanced training progression plan for an athlete in basketball.
 
+<img width="1362" height="925" alt="image" src="https://github.com/user-attachments/assets/d0604424-4c33-4b26-ab1c-b41d4f515268" />
+
+Suggest low-impact workouts to maintain fitness while recovering from an ankle sprain.
+
+
+
 
 
 
