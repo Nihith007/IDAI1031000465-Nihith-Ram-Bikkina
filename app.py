@@ -607,6 +607,8 @@ Emphasise safety throughout. Make the plan specific to {sport} movement demands.
             )
 
             with st.spinner("🤖 CoachBot is creating your personalised plan..."):
+                from google.generativeai.types import HarmCategory, HarmBlockThreshold
+                
                 model = genai.GenerativeModel(
                     model_name="gemini-2.5-flash",
                     generation_config={
@@ -617,10 +619,10 @@ Emphasise safety throughout. Make the plan specific to {sport} movement demands.
                         "candidate_count": 1,
                     },
                     safety_settings={
-                        'HARASSMENT': 'BLOCK_NONE',
-                        'HATE_SPEECH': 'BLOCK_NONE',
-                        'SEXUALLY_EXPLICIT': 'BLOCK_NONE',
-                        'DANGEROUS_CONTENT': 'BLOCK_NONE',
+                        HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_NONE,
+                        HarmCategory.HARM_CATEGORY_HATE_SPEECH: HarmBlockThreshold.BLOCK_NONE,
+                        HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: HarmBlockThreshold.BLOCK_NONE,
+                        HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: HarmBlockThreshold.BLOCK_NONE,
                     }
                 )
                 result = get_ai_response(model, selected_prompt)
@@ -706,6 +708,8 @@ Write your response in this format:
 Be conversational, expert, and practical. Do not use HTML tags.
 """
                 with st.spinner("🤖 Getting expert coaching advice..."):
+                    from google.generativeai.types import HarmCategory, HarmBlockThreshold
+                    
                     custom_model = genai.GenerativeModel(
                         "gemini-2.5-flash",
                         generation_config={
@@ -714,10 +718,10 @@ Be conversational, expert, and practical. Do not use HTML tags.
                             "candidate_count": 1,
                         },
                         safety_settings={
-                            'HARASSMENT': 'BLOCK_NONE',
-                            'HATE_SPEECH': 'BLOCK_NONE',
-                            'SEXUALLY_EXPLICIT': 'BLOCK_NONE',
-                            'DANGEROUS_CONTENT': 'BLOCK_NONE',
+                            HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_NONE,
+                            HarmCategory.HARM_CATEGORY_HATE_SPEECH: HarmBlockThreshold.BLOCK_NONE,
+                            HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: HarmBlockThreshold.BLOCK_NONE,
+                            HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: HarmBlockThreshold.BLOCK_NONE,
                         }
                     )
                     answer = get_ai_response(custom_model, custom_prompt)
